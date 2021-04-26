@@ -9,9 +9,11 @@ from scipy.integrate import quad
 # since this is an infinite sum, use n as a parameter
 def IB_problem1(nu, x, t, n_max):
     
-    # integrate over the interval (a,b)
-    a = x[0]
-    b = x[-1]
+    # integrate over the interval (a,b)=(0,1)
+    # not (x[0],x[-1]) since u(x,t) can be solved at a single 
+    # point rather than over an interval
+    
+    a = 0; b = 1
     
     def a_n_func(x,n):
         
@@ -26,7 +28,7 @@ def IB_problem1(nu, x, t, n_max):
         if n != 0:
             a_n = 2 * a_n
         
-        return a_n
+        return a_n[0]
      
     def sum_over_terms(x_c, t_c):
         
@@ -40,7 +42,6 @@ def IB_problem1(nu, x, t, n_max):
             den_sum += (a_n(n) * np.exp(-(n * np.pi)**2 * nu * t_c)
                     * np.cos(n * np.pi * x_c))
 
-#         print(den_sum)
         den_sum += a_n(0)
         num_sum *= 2 * np.pi * nu
 
@@ -49,7 +50,7 @@ def IB_problem1(nu, x, t, n_max):
     u = np.zeros((len(x), len(t)))
     for i in range(len(x)):
         for j in range(len(t)):
-            num, den = sum_over_terms(i, j)
+            num, den = sum_over_terms(x[i], t[j])
             u[i,j] = num / den
 
     return u
