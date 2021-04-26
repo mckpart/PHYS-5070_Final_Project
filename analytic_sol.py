@@ -21,14 +21,14 @@ def IB_problem1(nu, x, t, n_max):
         return f * np.cos(n * np.pi * x)
    
     def a_n(n):
-        # maybe come back and create finer grid to integrate over
-        # rather than using the grid input to the outer function
-        a_n = quad(a_n_func, a, b, args=(n))
+        # quad returns the integrated function and the error,
+        # so the first element of the returned tuple is taken
+        a_n = quad(a_n_func, a, b, args=(n))[0]
         
         if n != 0:
             a_n = 2 * a_n
         
-        return a_n[0]
+        return a_n
      
     def sum_over_terms(x_c, t_c):
         
