@@ -7,7 +7,7 @@ from scipy.integrate import quad
 # add to ref list
 # this is using an analytic solution from Inan and Bahadir
 # since this is an infinite sum, use n as a parameter
-def IB_problem1(nu, x, t, n_max):
+def IB_analytic_sum(nu, x, t, n_max, problem = 1):
     
     # integrate over the interval (a,b)=(0,1)
     # not (x[0],x[-1]) since u(x,t) can be solved at a single 
@@ -17,7 +17,12 @@ def IB_problem1(nu, x, t, n_max):
     
     def a_n_func(x,n):
         
-        f = np.exp(-(1 - np.cos(np.pi * x)) / (2 * np.pi * nu)) 
+        if problem == 1:
+            f = np.exp(-(1 - np.cos(np.pi * x)) / (2 * np.pi * nu)) 
+        
+        elif problem == 2:
+            f = np.exp(-x**2 * (3 - 2 * x) / (3 * nu))
+
         return f * np.cos(n * np.pi * x)
    
     def a_n(n):
