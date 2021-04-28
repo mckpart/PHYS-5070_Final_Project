@@ -4,15 +4,31 @@
 import numpy as np
 from scipy.integrate import quad
 
-# add to ref list
-# this is using an analytic solution from Inan and Bahadir
 # since this is an infinite sum, use n as a parameter
 def IB_analytic_sum(nu, x, t, n_max, problem = 1):
+    '''
+    Computes the analytic solution for the either of the first 
+    two problems outlined in Inan And Bahadir.
+
+    Args:
+        nu (float): kinematic viscosity -  must be nonnegative
+            for it to have physical meaning.
+        x (array): x-values to solve u(x,t) over
+        t (array): t-values to solve u(x,t) over
+        n_max (int): each point is a Fourier series, and n_max
+            is the truncation value for the series.
+        problem (int): determines which problem is to be solved
+            - 1: IC: u(x,0) = sin(pi*x), BC: u(0,t) = u(1,t) = 0
+            - 2: IC: u(x,0 = 4x(1-x),    BC: u(0,t) = u(1,t) = 0
+
+    Returns:
+        u (array): 2-d array containing the solution u(x,t). 
+            The element u[i,j] can be interpretted as the analytic
+            function evaluated as u(x[i],t[j]). 
     
-    # integrate over the interval (a,b)=(0,1)
-    # not (x[0],x[-1]) since u(x,t) can be solved at a single 
-    # point rather than over an interval
-    
+    '''
+
+    # integrate over the interval (a,b)=(0,1) 
     a = 0; b = 1
     
     def a_n_func(x,n):
@@ -41,6 +57,8 @@ def IB_analytic_sum(nu, x, t, n_max, problem = 1):
         den_sum = 0
 
         for n in range(1, n_max):
+            # the numerator and denominator are each truncated
+            # infinite series
             num_sum += (a_n(n) * np.exp(-(n * np.pi)**2 * nu * t_c)
                     * n * np.sin(n * np.pi * x_c))
             
