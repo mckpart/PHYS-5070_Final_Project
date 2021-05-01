@@ -39,4 +39,30 @@ from scipy.integrate import simpson, odeint
 # 
 #     return phi_init
 
- 
+
+# initialize tridiagonal matrices that form the 
+# system of equations
+# this function requires that M > 2
+def init_matrices(alpha, M):
+    
+    A = np.zeros((M-1,M-1))
+    B = np.zeros((M-1,M-1))
+    
+    alpha_2 = alpha * .5
+    alpha_p1 = alpha + 1
+    alpha_m1 = alpha - 1
+    
+    # set first and last rows
+    A[0][:2] = np.asarray([alpha_p1, -alpha_2])
+    A[M-2][-2:] = np.asarray([-alpha_2, alpha_p1])
+    
+    B[0][:2] = np.asarray([alpha_m1, alpha_2])
+    B[M-2][-2:] = np.asarray([alpha_2, alpha_m1])
+
+    for i in range(1,M-2):
+        
+        A[i][i-1:i+2] = np.asarray([-alpha_2, alpha_p1, -alpha_2])
+        B[i][i-1:i+2] = np.asarray([alpha_2, alpha_m1, alpha_2])
+                
+    return A, B
+# def solve_PDE(phi_0, x, t,  
