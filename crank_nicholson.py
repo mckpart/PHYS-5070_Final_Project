@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.integrate import simpson, odeint
+# from scipy.integrate import simpson, odeint
 
 # currently this assumes time independent boundary conditions
 
@@ -65,4 +65,36 @@ def init_matrices(alpha, M):
         B[i][i-1:i+2] = np.asarray([alpha_2, alpha_m1, alpha_2])
                 
     return A, B
+
+# might not need to actually compute A due to the high degree 
+# of symmetry
+# this is following the tridiagonalization procedure for Landau
+def solve_tri_diag(alpha, b):
+    
+    d = alpha + 1
+    a = -alpha/2
+    c = -alpha/2 
+
+    h = np.zeros_like(b)
+    p = np.zeros_like(b)
+
+    len_b = len(b)
+
+    # set first element of p and h
+    p[0] = b[0] / d
+    h[0] = c / d
+
+    for i in range(1,len_b):
+        h[i] = c / (d - a * h[i-1])
+        p[i] = (b[i] - a * p[i-1]) / (d - a * h[i-1])
+    
+    # initialize solution vector
+    x = np.zeros_like(b)
+    x[-1] = p[-1]
+   
+    # backwards solve from x[-1] -> x[0]
+    for i in range(0,len_b - 1):
+        x[-(i+2)] = p[-(i+2)] - h[-(i+2)] * x[-(i+1)]
+    
+    return x
 # def solve_PDE(phi_0, x, t,  
