@@ -71,32 +71,25 @@ def init_matrices(alpha, M):
 # this is following the tridiagonalization procedure for Landau
 def solve_tri_diag(A, b):
    
-   
-#     print(b[0])
     d = np.diagonal(A)
     a = np.diagonal(A,offset = -1)
     c = np.diagonal(A, offset = 1) 
 
-#     print(a,c)
     len_b = len(b)
     
     h = np.zeros(len_b-1)
     p = np.zeros_like(b)
 
-#     print(p.shape)
-
     # set first element of p and h
     p[0] = b[0] / d[0]
     h[0] = c[0] / d[0]
     
-#     print('the first elements',p,h)
-
+    # compute h and p. The algorithm in the text says a[i] rather
+    # than a[i-1], but this is because they begin with a[2]
     for i in range(1,len_b):
         if i < len_b - 1:
             h[i] = c[i] / (d[i] - a[i-1] * h[i-1])
         p[i] = (b[i] - a[i-1] * p[i-1]) / (d[i] - a[i-1] * h[i-1])
-    
-#     print('h and p:', h, p)
     
     # initialize solution vector
     x = np.zeros_like(b)
@@ -104,9 +97,7 @@ def solve_tri_diag(A, b):
    
     # backwards solve from x[-1] -> x[0]
     for i in range(0,len_b - 1):
-#         print(p[-(i+2)] - h[-(i+2)] * x[-(i+1)])
         x[-(i+2)] = p[-(i+2)] - h[-(i+1)] * x[-(i+1)]
-#         print(x)
     
     return x
 
@@ -127,11 +118,10 @@ def solve_PDE(phi_0, x, t, nu):
 
     # set initial conditions and boundary conditions
     phi_sol[:,0] = phi_0
-    phi_sol[0,:] = phi_0[0]
-    phi_sol[M,:] = phi_0[M]
+#     phi_sol[0,:] = phi_0[0]
+#     phi_sol[M,:] = phi_0[M]
 
-    # again, A doesn't need to be computed, but B does.
-    # Can remove the computation for A later if needed
+    # compute the A and B matrices
     A, B = init_matrices(alpha, M+2)
 
     # initial b = B * phi_0. Then the phi at later times
@@ -139,7 +129,6 @@ def solve_PDE(phi_0, x, t, nu):
     b = np.matmul(B, phi_0)
     for i in range(len(t)):
         w = solve_tri_diag(A, b)
-#         print(w)
         phi_sol[:,i] = w
         b = np.matmul(B,phi_sol[:,i])
 
