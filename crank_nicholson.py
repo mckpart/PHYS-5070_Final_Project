@@ -50,7 +50,7 @@ def init_matrices(alpha, M):
     
     alpha_2 = alpha * .5
     alpha_p1 = alpha + 1
-    alpha_m1 = alpha - 1
+    alpha_m1 = 1 - alpha
     
     # set first and last rows
     A[0][:2] = np.asarray([alpha_p1, -alpha_2])
@@ -97,4 +97,18 @@ def solve_tri_diag(alpha, b):
         x[-(i+2)] = p[-(i+2)] - h[-(i+2)] * x[-(i+1)]
     
     return x
-# def solve_PDE(phi_0, x, t,  
+
+# solves the heat equation for phi. This will still need to be transformed 
+# after solved to get final solution u(x,t)
+def solve_PDE(phi_0, x, t, nu):
+    
+    delta_t = t[1] - t[0]
+    delta_x = x[1] - x[0]
+
+    alpha = delta_t / (delta_x)**2 * nu 
+    
+    # initialize phi(x,t) and set phi(x,0)
+    phi_sol = np.zeros((len(x), len(t)))
+    
+
+    return 
