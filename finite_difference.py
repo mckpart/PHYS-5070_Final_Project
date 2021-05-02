@@ -66,7 +66,7 @@ def FiniteElements_Burgers_Higher_Order(nu,grid,time,initial_conditions):
         dudt[-2] = nu*(15/4*u[-1][-2] - 77/6*u[-1][-3] + 107/6*u[-1][-4] - 13*u[-1][-5] + 61/12*u[-1][-6] - 5/6*u[-1][-7])/delta_x**2 - u[-1][-2]*(25/12*u[-1][-2] - 4*u[-1][-3] + 3*u[-1][-4] - 4/3*u[-1][-5] + 1/4*u[-1][-6])/delta_x
         
         for n in range(2,len(grid)-2):
-            dudt[n] = nu*(-1/12*u[-1][n+2] + 4/3*u[-1][n+1] - 5/2*u[-1][n] + 4/3*u[-1][n-1] - 1/12*u[-1][n-2])/delta_x**2 - u[-1][n]*(-1/12*n[-1][n+2] + 2/3*u[-1][n+1] - 2/3*u[-1][n-1] + 1/12*u[-1][n-2])/(2*delta_x)
+            dudt[n] = nu*(-1/12*u[-1][n+2] + 4/3*u[-1][n+1] - 5/2*u[-1][n] + 4/3*u[-1][n-1] - 1/12*u[-1][n-2])/delta_x**2 - u[-1][n]*(-1/12*u[-1][n+2] + 2/3*u[-1][n+1] - 2/3*u[-1][n-1] + 1/12*u[-1][n-2])/(delta_x)
             
         u.append(u[-1] + dudt*delta_t)
         
@@ -91,4 +91,3 @@ def Plot_func(grid,time,u):
     fig = plt.figure(figsize=(12,12))
     ax = fig.add_subplot(111, projection='3d')
     ax.plot_surface(Grid,Time,u)
-    
