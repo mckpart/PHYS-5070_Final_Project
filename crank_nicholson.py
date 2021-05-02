@@ -53,11 +53,11 @@ def init_matrices(alpha, M):
     alpha_m1 = 1 - alpha
     
     # set first and last rows
-    A[0][:2] = np.asarray([alpha_p1, -alpha_2])
-    A[M-2][-2:] = np.asarray([-alpha_2, alpha_p1])
+    A[0][:2] = np.asarray([alpha_p1, -alpha_2*2])
+    A[M-2][-2:] = np.asarray([-alpha_2*2, alpha_p1])
     
-    B[0][:2] = np.asarray([alpha_m1, alpha_2])
-    B[M-2][-2:] = np.asarray([alpha_2, alpha_m1])
+    B[0][:2] = np.asarray([alpha_m1, alpha_2*2])
+    B[M-2][-2:] = np.asarray([alpha_2*2, alpha_m1])
 
     for i in range(1,M-2):
         
@@ -69,24 +69,34 @@ def init_matrices(alpha, M):
 # might not need to actually compute A due to the high degree 
 # of symmetry
 # this is following the tridiagonalization procedure for Landau
-def solve_tri_diag(alpha, b):
-    
-    d = alpha + 1
-    a = -alpha/2
-    c = -alpha/2 
+def solve_tri_diag(A, b):
+   
+   
+#     print(b[0])
+    d = np.diagonal(A)
+    a = np.diagonal(A,offset = -1)
+    c = np.diagonal(A, offset = 1) 
 
-    h = np.zeros_like(b)
+#     print(a,c)
+    len_b = len(b)
+    
+    h = np.zeros(len_b-1)
     p = np.zeros_like(b)
 
-    len_b = len(b)
+#     print(p.shape)
 
     # set first element of p and h
-    p[0] = b[0] / d
-    h[0] = c / d
+    p[0] = b[0] / d[0]
+    h[0] = c[0] / d[0]
+    
+#     print('the first elements',p,h)
 
     for i in range(1,len_b):
-        h[i] = c / (d - a * h[i-1])
-        p[i] = (b[i] - a * p[i-1]) / (d - a * h[i-1])
+        if i < len_b - 1:
+            h[i] = c[i] / (d[i] - a[i-1] * h[i-1])
+        p[i] = (b[i] - a[i-1] * p[i-1]) / (d[i] - a[i-1] * h[i-1])
+    
+#     print('h and p:', h, p)
     
     # initialize solution vector
     x = np.zeros_like(b)
@@ -94,7 +104,9 @@ def solve_tri_diag(alpha, b):
    
     # backwards solve from x[-1] -> x[0]
     for i in range(0,len_b - 1):
-        x[-(i+2)] = p[-(i+2)] - h[-(i+2)] * x[-(i+1)]
+#         print(p[-(i+2)] - h[-(i+2)] * x[-(i+1)])
+        x[-(i+2)] = p[-(i+2)] - h[-(i+1)] * x[-(i+1)]
+#         print(x)
     
     return x
 
@@ -120,14 +132,16 @@ def solve_PDE(phi_0, x, t, nu):
 
     # again, A doesn't need to be computed, but B does.
     # Can remove the computation for A later if needed
-    A, B = cn.init_matrices(alpha, M)
+    A, B = init_matrices(alpha, M+2)
 
     # initial b = B * phi_0. Then the phi at later times
     # is computed through A*w = b
-    b = np.matmul(B, phi_0[1:M])
+    b = np.matmul(B, phi_0)
     for i in range(len(t)):
-        w = cn.solve_tri_diag(alpha, b)
-        phi_sol[1:M,i] = w
-        b = np.matmul(B,w)
+        w = solve_tri_diag(A, b)
+#         print(w)
+        phi_sol[:,i] = w
+        b = np.matmul(B,phi_sol[:,i])
 
     return phi_sol 
+
