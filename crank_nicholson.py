@@ -98,17 +98,36 @@ def solve_tri_diag(alpha, b):
     
     return x
 
-# solves the heat equation for phi. This will still need to be transformed 
+
+# solves the heat equation for phi. This will still need to be transformed
 # after solved to get final solution u(x,t)
 def solve_PDE(phi_0, x, t, nu):
-    
+
     delta_t = t[1] - t[0]
     delta_x = x[1] - x[0]
 
-    alpha = delta_t / (delta_x)**2 * nu 
-    
+    alpha = delta_t / (delta_x)**2 * nu
+    # M-1 is the dimension of the matrices A and B
+    M = len(x) - 1
+
     # initialize phi(x,t) and set phi(x,0)
     phi_sol = np.zeros((len(x), len(t)))
-    
 
-    return 
+    # set initial conditions and boundary conditions
+    phi_sol[:,0] = phi_0
+    phi_sol[0,:] = phi_0[0]
+    phi_sol[M,:] = phi_0[M]
+
+    # again, A doesn't need to be computed, but B does.
+    # Can remove the computation for A later if needed
+    A, B = cn.init_matrices(alpha, M)
+
+    # initial b = B * phi_0. Then the phi at later times
+    # is computed through A*w = b
+    b = np.matmul(B, phi_0[1:M])
+    for i in range(len(t)):
+        w = cn.solve_tri_diag(alpha, b)
+        phi_sol[1:M,i] = w
+        b = np.matmul(B,w)
+
+    return phi_sol 
