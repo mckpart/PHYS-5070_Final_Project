@@ -8,4 +8,4 @@ The Crank-Nicholson solver has the limitation that the boundary conditions are a
 
 The file [analytic_sol.py](./analytic_sol.py) contains two analytic solutions as described by Inan and Bahadir. The solutions are both truncated infinite series that require numerical integration to compute the coefficients in the sum. These analytic solutions are then later added to test the accuracy of the numerical schemes. 
 
-In [finite_difference.py](./finite_difference.py)
+In [finite_difference.py](./finite_difference.py) there are two finite difference solvers. The first solver FiniteElements_Burgers takes uses the most basic finite difference scheme to numerically approximate the solution. The second solver FiniteElements_Burgers_Higher_Order uses a higher order finite difference method. Finally, this file also contains the function Plot_func which plots the solutions in three dimensions.
