@@ -25,6 +25,7 @@ def transform_u0(u_init, x_arr, nu):
 
     # y0 = 1 since u(0,0) = 0
     phi_init = odeint(ode, y0=1, t =x_arr)
+    phi_init = np.reshape(phi_init, phi_init.shape[0])
 
     return phi_init
 
