@@ -47,6 +47,17 @@ def init_matrices(alpha, M):
 # of symmetry
 # this is following the tridiagonalization procedure for Landau
 def solve_tri_diag(A, b):
+    '''
+    Given tridiagonal matrix A, x in the equation Ax = b is
+    solved for and returned. 
+
+    Args:
+        A (array): 2-d array, a tridiagonal matrix
+        b (array): 1-d array. In this problem b is B*phi_j
+
+    Returns:
+        x (array): the solution to Ax = b 
+    '''  
    
     d = np.diagonal(A)
     a = np.diagonal(A,offset = -1)
