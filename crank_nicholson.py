@@ -179,3 +179,13 @@ def transform_phi(phi, del_x, nu):
             u[i,j]= -nu * (phi[i+1,j]-phi[i-1,j])/(del_x * phi[i,j])
             
     return u
+
+def CN_solver(u_init, x, t, nu):
+
+    dx = x[1] - x[0]
+
+    phi_0 = transform_u0(u_init, x, nu)
+    phi = solve_PDE(phi_0, x, t, nu)
+    u = transform_phi(phi, dx, nu)
+
+    return u
