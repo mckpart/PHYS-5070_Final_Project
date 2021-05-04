@@ -181,6 +181,19 @@ def transform_phi(phi, del_x, nu):
     return u
 
 def CN_solver(u_init, x, t, nu):
+    '''
+    Wrapper function. When called, it transforms u(x,0) to phi(x,0),
+    computes phi(x,t), and converts phi(x,t) to u(x,t)
+
+    Args:
+        u_init (function): a function of x describing u(x,0)
+        x (array): 1-d array containing the spatial domain
+        t (array): 1-d array containing the temporal domain
+        nu (float): kinematic viscosity
+
+    Returns:
+        u (array): 2-d array containing u(x,t)
+    '''  
 
     dx = x[1] - x[0]
 
