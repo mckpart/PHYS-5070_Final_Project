@@ -1,7 +1,33 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.integrate import odeint
 
 # currently this assumes time independent boundary conditions
+
+# for boundary conditions u(0,t) = u(L,t) = 0, this allows
+# u(x,0) to be transformed to the IC phi(x,0)
+def transform_u0(u_init, x_arr, nu):
+    '''
+    Accepts u(x,0) and converts this IC to the IC phi(x,0). 
+
+    Args:
+        u_init (function): a function of x describing u(x,0)
+        x_arr (array): 1-d array containing the spatial domain
+        nu (float): kinematic viscosity
+
+    Returns:
+        phi_init (array): 1-d array containing phi(x,0)
+    '''  
+    
+    def ode(phi, x):
+        u = u_init(x)
+        return 1/(-2 * nu) * phi * u
+
+    # y0 = 1 since u(0,0) = 0
+    phi_init = odeint(ode, y0=1, t =x_arr)
+    phi_init = np.reshape(phi_init, phi_init.shape[0])
+
+    return phi_init
 
 # initialize tridiagonal matrices that form the 
 # system of equations
@@ -47,6 +73,17 @@ def init_matrices(alpha, M):
 # of symmetry
 # this is following the tridiagonalization procedure for Landau
 def solve_tri_diag(A, b):
+    '''
+    Given tridiagonal matrix A, x in the equation Ax = b is
+    solved for and returned. 
+
+    Args:
+        A (array): 2-d array, a tridiagonal matrix
+        b (array): 1-d array. In this problem b is B*phi_j
+
+    Returns:
+        x (array): the solution to Ax = b 
+    '''  
    
     d = np.diagonal(A)
     a = np.diagonal(A,offset = -1)
@@ -113,6 +150,20 @@ def solve_PDE(phi_0, x, t, nu):
 
 # transforms phi(x,t) to the final solution u(x,t)
 def transform_phi(phi, del_x, nu):
+    '''
+    Accepts phi(x,t) and uses the Cole-Hopf transformation to 
+    compute u(x,t). 
+
+    Args:
+        phi (array): 2-d array where phi[i,j] = phi(x[i],t[j])
+        del_x (float): the grid spacing for x
+        nu (float): kinematic viscosity
+
+    Returns:
+        u (array): 2-d array containing u(x,t) where u[i,j] = 
+            u(x[i],t[j])
+    '''  
+
     u = np.zeros_like(phi)
     
     # set the boundary conditions
