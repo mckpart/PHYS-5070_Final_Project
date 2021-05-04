@@ -124,6 +124,20 @@ def solve_PDE(phi_0, x, t, nu):
 
 # transforms phi(x,t) to the final solution u(x,t)
 def transform_phi(phi, del_x, nu):
+    '''
+    Accepts phi(x,t) and uses the Cole-Hopf transformation to 
+    compute u(x,t). 
+
+    Args:
+        phi (array): 2-d array where phi[i,j] = phi(x[i],t[j])
+        del_x (float): the grid spacing for x
+        nu (float): kinematic viscosity
+
+    Returns:
+        u (array): 2-d array containing u(x,t) where u[i,j] = 
+            u(x[i],t[j])
+    '''  
+
     u = np.zeros_like(phi)
     
     # set the boundary conditions
