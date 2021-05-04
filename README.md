@@ -4,4 +4,4 @@ The project contains three numerical methods to solve Burger's equation, a simpl
 
 Tests of these methods are included in the Project_Write-Up.ipynb file. There the user can find examples of how to obtain a solution for a given problem. 
 
-The Crank-Nicholson solver has the limitation that the boundary conditions are assumed to be 0. In other words, that $u(0,t) = u(L,t) = 0$. 
+The Crank-Nicholson solver has the limitation that the boundary conditions are assumed to be 0.
