@@ -1,7 +1,32 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.integrate import odeint
 
 # currently this assumes time independent boundary conditions
+
+# for boundary conditions u(0,t) = u(L,t) = 0, this allows
+# u(x,0) to be transformed to the IC phi(x,0)
+def transform_u0(u_init, x_arr, nu):
+    '''
+    Accepts u(x,0) and converts this IC to the IC phi(x,0). 
+
+    Args:
+        u_init (function): a function of x describing u(x,0)
+        x_arr (array): 1-d array containing the spatial domain
+        nu (float): kinematic viscosity
+
+    Returns:
+        phi_init (array): 1-d array containing phi(x,0)
+    '''  
+    
+    def ode(phi, x):
+        u = u_init(x)
+        return 1/(-2 * nu) * phi * u
+
+    # y0 = 1 since u(0,0) = 0
+    phi_init = odeint(ode, y0=1, t =x_arr)
+
+    return phi_init
 
 # initialize tridiagonal matrices that form the 
 # system of equations
