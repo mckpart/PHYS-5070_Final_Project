@@ -88,6 +88,6 @@ def Plot_func(grid,time,u):
     """
     Grid,Time = np.meshgrid(grid,time)
     
-    fig = plt.figure(figsize=(12,12))
+    fig = plt.figure(figsize=(6,6))
     ax = fig.add_subplot(111, projection='3d')
     ax.plot_surface(Grid,Time,u)
