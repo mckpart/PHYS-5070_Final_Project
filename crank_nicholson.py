@@ -1,52 +1,29 @@
 import numpy as np
 import matplotlib.pyplot as plt
-# from scipy.integrate import simpson, odeint
 
 # currently this assumes time independent boundary conditions
-
-# create a function that transforms initial conditions using Cole-Hopf
-# transformation
-
-# look into making this function more robust to transform between phi and 
-# u, not just for the initial conditions
-
-# FOR NOW THE TRANSFORMED INITIAL CONDITIONS NEED TO BE COMPUTED ANALYTICALLY
-
-# def transform_init(u_init, x_arr, nu):
-#     '''
-#     Transforms the initial conditions from u(x,0) to phi(x,0)
-#     using the Cole-Hopf transformation.
-# 
-#     Args:
-#         nu (float): kinematic viscosity -  must be nonnegative
-#             for it to have physical meaning.
-#         u_init (array): 
-# 
-#     Returns:
-#         phi_init (array): 1-d array containing the the transformed
-#             u(x,0) which is given by phi(x,0)
-#     '''
-# 
-#     def ode(phi, x):
-#         i = (x_arr == x)
-#         u = u_init[i][0]
-#         return -2 * nu * phi * u
-# 
-#     # come up with better way to set IC
-#     phi_init = odeint(ode, y0=1, x)
-# #     U = simpson(u_init, dx = .1)
-# #     phi_init = np.exp(-simpson( / (2 * nu)) 
-# 
-#     return phi_init
-
 
 # initialize tridiagonal matrices that form the 
 # system of equations
 # this function requires that M > 2
 def init_matrices(alpha, M):
-    
-    A = np.zeros((M-1,M-1))
-    B = np.zeros((M-1,M-1))
+    '''
+    Initializes both tridiagonal matrices that represent the 
+    system of difference equations.
+
+    Args:
+        alpha (float): alpha = nu * delta t / (delta x)^2
+        M (int): each matrix will have dimension MxM
+
+    Returns:
+        A (array): 2-d array representing the matrix that acts
+            on the phi_(j+1) array
+        B (array): 2-d array representing the matrix that acts
+            on the phi_(j) array
+    '''  
+
+    A = np.zeros((M, M))
+    B = np.zeros((M, M))
     
     alpha_2 = alpha * .5
     alpha_p1 = alpha + 1
@@ -54,12 +31,12 @@ def init_matrices(alpha, M):
     
     # set first and last rows
     A[0][:2] = np.asarray([alpha_p1, -alpha_2*2])
-    A[M-2][-2:] = np.asarray([-alpha_2*2, alpha_p1])
+    A[M-1][-2:] = np.asarray([-alpha_2*2, alpha_p1])
     
     B[0][:2] = np.asarray([alpha_m1, alpha_2*2])
-    B[M-2][-2:] = np.asarray([alpha_2*2, alpha_m1])
+    B[M-1][-2:] = np.asarray([alpha_2*2, alpha_m1])
 
-    for i in range(1,M-2):
+    for i in range(1,M-1):
         
         A[i][i-1:i+2] = np.asarray([-alpha_2, alpha_p1, -alpha_2])
         B[i][i-1:i+2] = np.asarray([alpha_2, alpha_m1, alpha_2])
@@ -110,19 +87,19 @@ def solve_PDE(phi_0, x, t, nu):
     delta_x = x[1] - x[0]
 
     alpha = delta_t / (delta_x)**2 * nu
-    # M-1 is the dimension of the matrices A and B
-    M = len(x) - 1
+    
+    # the matrices A,B will have dim MxM
+    M = len(x)
 
     # initialize phi(x,t) and set phi(x,0)
     phi_sol = np.zeros((len(x), len(t)))
 
-    # set initial conditions and boundary conditions
+    # set initial conditions. the boundary conditions are assumed
+    # to be phi_x(0,t)=phi_x(L,t) = 0
     phi_sol[:,0] = phi_0
-#     phi_sol[0,:] = phi_0[0]
-#     phi_sol[M,:] = phi_0[M]
 
     # compute the A and B matrices
-    A, B = init_matrices(alpha, M+2)
+    A, B = init_matrices(alpha, M)
 
     # initial b = B * phi_0. Then the phi at later times
     # is computed through A*w = b
@@ -134,3 +111,20 @@ def solve_PDE(phi_0, x, t, nu):
 
     return phi_sol 
 
+# transforms phi(x,t) to the final solution u(x,t)
+def transform_phi(phi, del_x, nu):
+    u = np.zeros_like(phi)
+    
+    # set the boundary conditions
+    u[0,:] = 0
+    u[-1,:] = 0
+    
+    lx, lr = phi.shape
+    
+    # do not update boundaries
+    for i in range(1,lx-1):
+        # each step in time must be updated, including t = 0
+        for j in range(lr):
+            u[i,j]= -nu * (phi[i+1,j]-phi[i-1,j])/(del_x * phi[i,j])
+            
+    return u
